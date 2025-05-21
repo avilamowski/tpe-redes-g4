@@ -3,15 +3,16 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_socketio import SocketIO, emit
 from datetime import datetime
 import os
+from flask_cors import CORS
 
 app = Flask(__name__)
+CORS(app)
 app.config["SQLALCHEMY_DATABASE_URI"] = os.getenv(
     "DATABASE_URL", "postgresql://postgres:postgres@db:5432/chatdb"
 )
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
-# socketio = SocketIO(app, cors_allowed_origins="*")
-socketio = SocketIO(app, cors_allowed_origins=None)
+socketio = SocketIO(app, cors_allowed_origins="*")
 
 db = SQLAlchemy(app)
 
@@ -39,7 +40,6 @@ def create_user():
     db.session.add(new_user)
     db.session.commit()
     response = jsonify({"id": new_user.id, "name": new_user.name}), 201
-    response.headers.add("Access-Control-Allow-Origin", "*")
     return response
 
 
