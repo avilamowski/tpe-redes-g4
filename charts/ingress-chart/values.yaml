@@ -1,0 +1,15 @@
+ingress:
+  enabled: true
+  host: minikube
+
+  frontend:
+    serviceName: chat-frontend
+    servicePort: 80
+
+  backend:
+    serviceName: message-service
+    servicePort: 5000
+
+  annotations:
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "3600"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "3600"

@@ -154,13 +154,19 @@
 </div>
 
 <script>
-  const socket = io('http://localhost:8080');
+  const WS_API_HOST = 'http://minikube'; // TODO: set as env var
+  const socket = io(WS_API_HOST, {
+    path: '/api/ws',
+    transports: ['websocket']
+  });
   let userId = null;
+
+  const API_URL = 'http://minikube/api'; // TODO: set as env var
 
   function submitUsername() {
     const name = document.getElementById('username-input').value;
     if (!name) return;
-    fetch('http://localhost:8080/users', {
+    fetch(`${API_URL}/users`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ name })
@@ -176,7 +182,9 @@
 
   function sendMessage() {
     const content = document.getElementById('message').value;
+    console.log('Sending message:', content);
     if (!userId || !content) return;
+    console.log('User ID:', userId);
     socket.emit('send_message', { user_id: userId, content });
     document.getElementById('message').value = '';
   }

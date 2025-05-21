@@ -1,0 +1,29 @@
+{{- if .Values.ingress.enabled }}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: chat-ingress
+  annotations:
+    {{- range $key, $value := .Values.ingress.annotations }}
+    {{ $key }}: {{ $value | quote }}
+    {{- end }}
+spec:
+  rules:
+    - host: {{ .Values.ingress.host }}
+      http:
+        paths:
+          - path: /api
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ .Values.ingress.backend.serviceName }}
+                port:
+                  number: {{ .Values.ingress.backend.servicePort }}
+          - path: /frontend
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ .Values.ingress.frontend.serviceName }}
+                port:
+                  number: {{ .Values.ingress.frontend.servicePort }}
+{{- end }}

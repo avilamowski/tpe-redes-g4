@@ -4,7 +4,7 @@ import os
 app = Flask(__name__, static_folder="static")
 
 
-@app.route("/")
+@app.route("/frontend")
 def index():
     return send_from_directory("static", "index.html")
 

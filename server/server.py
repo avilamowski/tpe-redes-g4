@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, Blueprint
 from flask_sqlalchemy import SQLAlchemy
 from flask_socketio import SocketIO, emit
 from datetime import datetime
@@ -12,9 +12,11 @@ app.config["SQLALCHEMY_DATABASE_URI"] = os.getenv(
 )
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
-socketio = SocketIO(app, cors_allowed_origins="*")
+socketio = SocketIO(app, cors_allowed_origins="*", path="/api/ws")
 
 db = SQLAlchemy(app)
+
+api_bp = Blueprint('api', __name__, url_prefix='/api')
 
 
 class User(db.Model):
@@ -32,28 +34,32 @@ class Message(db.Model):
 
     user = db.relationship("User")
 
-
-@app.route("/users", methods=["POST"])
+@api_bp.route("/users", methods=["POST"])
 def create_user():
     data = request.json
-    new_user = User(name=data["name"])
-    db.session.add(new_user)
-    db.session.commit()
-    response = jsonify({"id": new_user.id, "name": new_user.name}), 201
+    existing_user = User.query.filter_by(name=data["name"]).first()
+    if existing_user:
+        response = jsonify({"id": existing_user.id, "name": existing_user.name}), 200
+    else:
+        new_user = User(name=data["name"])
+        db.session.add(new_user)
+        db.session.commit()
+        response = jsonify({"id": new_user.id, "name": new_user.name}), 201
     return response
 
 
-@app.route("/users/<int:user_id>", methods=["GET"])
+@api_bp.route("/users/<int:user_id>", methods=["GET"])
 def get_user(user_id):
     user = User.query.get_or_404(user_id)
     return jsonify({"id": user.id, "name": user.name})
 
 
-@app.route("/users", methods=["GET"])
+@api_bp.route("/users", methods=["GET"])
 def get_all_users():
     users = User.query.all()
     return jsonify([{"id": user.id, "name": user.name} for user in users])
 
+app.register_blueprint(api_bp)
 
 @socketio.on("send_message")
 def handle_send_message(data):
