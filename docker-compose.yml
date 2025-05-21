@@ -1,0 +1,45 @@
+version: '3.8'
+
+services:
+  server:
+    build: 
+      context: server
+    command: flask run --host=0.0.0.0
+    ports:
+      - "8080:5000"
+    environment:
+      - FLASK_APP=server.py
+      - FLASK_ENV=development
+      - DATABASE_URL=postgresql://postgres:postgres@db:5432/chatdb
+    depends_on:
+      - db
+  
+  client:
+    build:
+      context: client
+    command: flask run --host=0.0.0.0
+    ports:
+      - "8081:8081"
+    environment:
+      - FLASK_APP=client.py
+      - FLASK_ENV=development
+
+  db:
+    image: postgres:15
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: chatdb
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  pgdata:
