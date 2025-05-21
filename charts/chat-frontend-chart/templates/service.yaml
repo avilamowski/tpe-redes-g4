@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: chat-frontend
+  labels:
+    app: chat-frontend
+spec:
+  type: ClusterIP
+  selector:
+    app: chat-frontend
+  ports:
+    - port: {{ .Values.service.port }}
+      targetPort: 8001
+      protocol: TCP
+      name: http
