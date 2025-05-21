@@ -65,6 +65,7 @@ def handle_send_message(data):
         {
             "id": message.id,
             "user_id": message.user_id,
+            "user_name": message.user.name,
             "content": message.content,
             "timestamp": message.timestamp.isoformat(),
         },
@@ -81,6 +82,7 @@ def handle_get_messages():
             {
                 "id": m.id,
                 "user_id": m.user_id,
+                "user_name": m.user.name,
                 "content": m.content,
                 "timestamp": m.timestamp.isoformat(),
             }

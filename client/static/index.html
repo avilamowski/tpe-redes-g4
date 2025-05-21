@@ -142,10 +142,8 @@
 
 <div id="chat-container" style="display: none;">
   <div id="chat-header">
-    <img src="https://i.pravatar.cc/100?img=65" alt="avatar">
     <div>
-      <span>Chat with Beata</span><br>
-      <span id="status">We are online!</span>
+      <span>Chat</span><br>
     </div>
   </div>
   <div id="chat-box"></div>
@@ -160,12 +158,11 @@
   let userId = null;
 
   function submitUsername() {
-    console.log('entre holi')
     const name = document.getElementById('username-input').value;
     if (!name) return;
     fetch('http://localhost:8080/users', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Origin': 'http://localhost:8080' },
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ name })
     })
     .then(res => res.json())
@@ -195,14 +192,14 @@
   }
 
   socket.on('new_message', msg => {
-    appendMessage(`User ${msg.user_id}: ${msg.content}`, msg.user_id === userId);
+    appendMessage(`${msg.user_name}: ${msg.content}`, msg.user_id === userId);
   });
 
   socket.on('message_list', msgs => {
     const chatBox = document.getElementById('chat-box');
     chatBox.innerHTML = '';
     msgs.forEach(msg => {
-      appendMessage(`User ${msg.user_id}: ${msg.content}`, msg.user_id === userId);
+      appendMessage(`${msg.user_name}: ${msg.content}`, msg.user_id === userId);
     });
   });
 </script>
