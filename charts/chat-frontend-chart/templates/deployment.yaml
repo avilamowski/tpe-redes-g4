@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   name: chat-frontend
 spec:
-  replicas: {{ .Values.replicaCount }}
+  replicas: {{ .Values.replicaCount | default 1 }}
   selector:
     matchLabels:
       app: chat-frontend
@@ -14,8 +14,6 @@ spec:
     spec:
       containers:
         - name: chat-frontend
-          # TODO: See if we should use ECR
-          # if repository is not defined, dont add repository
           image: "{{ if .Values.image.repository }}{{ .Values.image.repository }}{{ else }}chat-frontend{{ end }}:{{ .Values.image.tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
