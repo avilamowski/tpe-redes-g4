@@ -1,6 +1,5 @@
 ingress:
   enabled: true
-  host: minikube
 
   frontend:
     serviceName: chat-frontend
