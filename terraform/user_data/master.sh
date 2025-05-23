@@ -5,6 +5,10 @@ curl -sfL https://get.k3s.io | K3S_TOKEN="$K3S_TOKEN" sh -
 curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
 git clone https://github.com/avilamowski/tpe-redes-g4.git
 cd tpe-redes-g4
+export KUBECONFIG=~/.kube/config
+mkdir ~/.kube 2> /dev/null
+sudo k3s kubectl config view --raw > "$KUBECONFIG"
+chmod 600 "$KUBECONFIG"
 while [ $(kubectl get nodes | grep Ready | wc -l) -lt 2 ]; do
     sleep 5
 done

@@ -135,7 +135,7 @@
 <div id="username-modal">
   <div id="modal-content">
     <h3>Enter your username</h3>
-    <input type="text" id="username-input" placeholder="Username">
+    <input type="text" id="username-input" placeholder="Username" onkeydown="if(event.key==='Enter'){submitUsername();}">
     <button onclick="submitUsername()">Start Chat</button>
   </div>
 </div>
@@ -148,7 +148,7 @@
   </div>
   <div id="chat-box"></div>
   <div id="chat-input">
-    <input type="text" id="message" placeholder="Enter your message...">
+    <input type="text" id="message" placeholder="Enter your message..." onkeydown="if(event.key==='Enter'){sendMessage();}">
     <button onclick="sendMessage()">&#9658;</button>
   </div>
 </div>
