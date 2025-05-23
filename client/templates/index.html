@@ -154,14 +154,14 @@
 </div>
 
 <script>
-  const WS_API_HOST = 'http://44.203.120.204'; // TODO: set as env var
+  const WS_API_HOST = '{{ ws_api_host }}'; 
   const socket = io(WS_API_HOST, {
     path: '/api/ws',
     transports: ['websocket']
   });
   let userId = null;
 
-  const API_URL = 'http://44.203.120.204/api'; // TODO: set as env var
+  const API_URL = '{{ api_url }}'; 
 
   function submitUsername() {
     const name = document.getElementById('username-input').value;

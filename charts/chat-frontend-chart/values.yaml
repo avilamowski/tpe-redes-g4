@@ -7,6 +7,7 @@ replicaCount: 1
 
 image:
   pullPolicy: IfNotPresent
+  repository: "j0liu/chat-frontend"
   tag: "latest"
 
 

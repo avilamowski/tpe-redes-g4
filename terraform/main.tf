@@ -7,14 +7,32 @@ resource "aws_key_pair" "node-key" {
   public_key = file(local.key_file_name)
 }
 
+data "template_file" "master_user_data" {
+  template = file("${path.module}/user_data/master.sh")
+
+  vars = {
+    token = "test"
+  }
+}
+
 resource "aws_instance" "master" {
   ami                    = local.ami
   instance_type          = local.instance_type
   key_name               = aws_key_pair.node-key.key_name
   vpc_security_group_ids = [aws_security_group.example.id]
+  user_data              = data.template_file.master_user_data.rendered
 
   tags = {
     Name = "master-node"
+  }
+}
+
+data "template_file" "worker_user_data" {
+  template = file("${path.module}/user_data/worker.sh")
+
+  vars = {
+    token     = "test"
+    master_ip = aws_instance.master.private_ip
   }
 }
 
@@ -24,6 +42,9 @@ resource "aws_instance" "node" {
   instance_type          = local.instance_type
   key_name               = aws_key_pair.node-key.key_name
   vpc_security_group_ids = [aws_security_group.example.id]
+  user_data              = data.template_file.worker_user_data.rendered
+
+  depends_on = [aws_instance.master] # TODO: Check race conditions
 
   tags = {
     Name = "worker-node-${count.index + 1}"
