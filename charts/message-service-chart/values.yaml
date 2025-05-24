@@ -14,9 +14,14 @@ image:
 service:
   port: 5000
 
+
 env:
-  # TODO: Manage secrets
-  DATABASE_URL: "postgresql://redes:kubernetes@postgres-postgresql:5432/chatdb"
+  # DATABASE_URL: "postgresql://redes:kubernetes@postgres-postgresql:5432/chatdb"
+  databaseSecret:
+    name: postgres-secret
+    userKey: username
+    passKey: password
+    dbKey: database
 
 # This section is for setting up autoscaling more information can be found here: https://kubernetes.io/docs/concepts/workloads/autoscaling/
 autoscaling:

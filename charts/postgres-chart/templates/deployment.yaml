@@ -1,22 +1,22 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: message-service
+  name: postgres-deployment
+  labels:
+    app: postgres-db
 spec:
-  {{- if not .Values.autoscaling.enabled }}
   replicas: {{ .Values.replicaCount }}
-  {{- end }}
   selector:
     matchLabels:
-      app: message-service
+      app: postgres-db
   template:
     metadata:
       labels:
-        app: message-service
+        app: postgres-db
     spec:
       containers:
-        - name: message-service
-          image: "{{ if .Values.image.repository }}{{ .Values.image.repository }}{{ else }}message-service{{ end }}:{{ .Values.image.tag }}"
+        - name: postgres
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
             - containerPort: {{ .Values.service.port }}
@@ -29,7 +29,7 @@ spec:
             - name: POSTGRES_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: postgres-secret 
+                  name: postgres-secret
                   key: password
             - name: POSTGRES_DB
               valueFrom:
@@ -38,5 +38,10 @@ spec:
                   key: database
             - name: DATABASE_URL
               value: "postgresql://$(POSTGRES_USER):$(POSTGRES_PASSWORD)@postgres-db:5432/$(POSTGRES_DB)"
-
-
+          volumeMounts:
+            - mountPath: /var/lib/postgresql/data
+              name: postgresdata
+      volumes:
+        - name: postgresdata
+          persistentVolumeClaim:
+            claimName: {{ .Values.persistence.existingClaim }}

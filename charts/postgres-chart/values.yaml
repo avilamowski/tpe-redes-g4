@@ -1,0 +1,23 @@
+replicaCount: 1
+
+image:
+  repository: postgres
+  tag: "15"
+  pullPolicy: IfNotPresent
+
+postgres:
+  username: redes
+  password: kubernetes
+  database: chatdb
+
+persistence:
+  enabled: true
+  storageClass: "manual"
+  accessModes:
+    - ReadWriteMany
+  size: 2Gi
+  existingClaim: postgres-volume-claim
+
+service:
+  type: ClusterIP
+  port: 5432

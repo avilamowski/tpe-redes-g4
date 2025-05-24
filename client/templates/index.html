@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Chat Widget</title>
   <script src="https://cdn.socket.io/4.6.1/socket.io.min.js"></script>
   <style>
@@ -33,17 +33,8 @@
       align-items: center;
       gap: 12px;
     }
-    #chat-header img {
-      border-radius: 50%;
-      width: 40px;
-      height: 40px;
-    }
     #chat-header span {
       font-weight: bold;
-    }
-    #status {
-      font-size: 12px;
-      opacity: 0.8;
     }
     #chat-box {
       background: #f7f8fa;
@@ -54,20 +45,34 @@
       flex-direction: column;
       gap: 10px;
     }
+    .message-wrapper {
+      display: flex;
+      flex-direction: column;
+      max-width: 80%;
+    }
+    .user-message-wrapper {
+      align-self: flex-end;
+      text-align: right;
+    }
+    .bot-message-wrapper {
+      align-self: flex-start;
+      text-align: left;
+    }
+    .username {
+      font-size: 11px;
+      font-weight: bold;
+      color: #555;
+      margin-bottom: 2px;
+      padding: 0 4px;
+    }
     .message {
       background: white;
       padding: 10px 14px;
       border-radius: 12px;
       box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-      max-width: 80%;
     }
     .user-message {
-      align-self: flex-end;
       background-color: #e3f2fd;
-    }
-    .bot-message {
-      align-self: flex-start;
-      background-color: #fff;
     }
     #chat-input {
       display: flex;
@@ -182,32 +187,42 @@
 
   function sendMessage() {
     const content = document.getElementById('message').value;
-    console.log('Sending message:', content);
     if (!userId || !content) return;
-    console.log('User ID:', userId);
     socket.emit('send_message', { user_id: userId, content });
     document.getElementById('message').value = '';
   }
 
-  function appendMessage(msg, isUser) {
+  function appendMessage(msg, isUser, userName = '') {
     const chatBox = document.getElementById('chat-box');
+
+    const wrapper = document.createElement('div');
+    wrapper.classList.add('message-wrapper');
+    wrapper.classList.add(isUser ? 'user-message-wrapper' : 'bot-message-wrapper');
+
+    const nameTag = document.createElement('div');
+    nameTag.classList.add('username');
+    nameTag.innerText = userName;
+
     const div = document.createElement('div');
     div.classList.add('message');
     div.classList.add(isUser ? 'user-message' : 'bot-message');
     div.innerText = msg;
-    chatBox.appendChild(div);
+
+    wrapper.appendChild(nameTag);
+    wrapper.appendChild(div);
+    chatBox.appendChild(wrapper);
     chatBox.scrollTop = chatBox.scrollHeight;
   }
 
   socket.on('new_message', msg => {
-    appendMessage(`${msg.user_name}: ${msg.content}`, msg.user_id === userId);
+    appendMessage(msg.content, msg.user_id === userId, msg.user_name);
   });
 
   socket.on('message_list', msgs => {
     const chatBox = document.getElementById('chat-box');
     chatBox.innerHTML = '';
     msgs.forEach(msg => {
-      appendMessage(`${msg.user_name}: ${msg.content}`, msg.user_id === userId);
+      appendMessage(msg.content, msg.user_id === userId, msg.user_name);
     });
   });
 </script>
