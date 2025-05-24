@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Chat Widget</title>
+  <title>Super Kubernetes Chat</title>
   <script src="https://cdn.socket.io/4.6.1/socket.io.min.js"></script>
   <style>
     body {
@@ -73,6 +73,19 @@
     }
     .user-message {
       background-color: #e3f2fd;
+    }
+    .timestamp {
+      font-size: 10px;
+      color: #999;
+      margin-top: 2px;
+      padding: 0 4px;
+      align-self: flex-end;
+    }
+    .user-message-wrapper .timestamp {
+      text-align: right;
+    }
+    .bot-message-wrapper .timestamp {
+      text-align: left;
     }
     #chat-input {
       display: flex;
@@ -147,9 +160,7 @@
 
 <div id="chat-container" style="display: none;">
   <div id="chat-header">
-    <div>
-      <span>Chat</span><br>
-    </div>
+    <span>Super Kubernetes Chat</span>
   </div>
   <div id="chat-box"></div>
   <div id="chat-input">
@@ -192,7 +203,16 @@
     document.getElementById('message').value = '';
   }
 
-  function appendMessage(msg, isUser, userName = '') {
+  function formatTime(timestamp) {
+    if (!timestamp) {
+      const now = new Date();
+      return now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    }
+    const date = new Date(timestamp);
+    return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  }
+
+  function appendMessage(msg, isUser, userName = '', timestamp = '') {
     const chatBox = document.getElementById('chat-box');
 
     const wrapper = document.createElement('div');
@@ -208,21 +228,26 @@
     div.classList.add(isUser ? 'user-message' : 'bot-message');
     div.innerText = msg;
 
+    const timeTag = document.createElement('div');
+    timeTag.classList.add('timestamp');
+    timeTag.innerText = formatTime(timestamp);
+
     wrapper.appendChild(nameTag);
     wrapper.appendChild(div);
+    wrapper.appendChild(timeTag);
     chatBox.appendChild(wrapper);
     chatBox.scrollTop = chatBox.scrollHeight;
   }
 
   socket.on('new_message', msg => {
-    appendMessage(msg.content, msg.user_id === userId, msg.user_name);
+    appendMessage(msg.content, msg.user_id === userId, msg.user_name, msg.timestamp);
   });
 
   socket.on('message_list', msgs => {
     const chatBox = document.getElementById('chat-box');
     chatBox.innerHTML = '';
     msgs.forEach(msg => {
-      appendMessage(msg.content, msg.user_id === userId, msg.user_name);
+      appendMessage(msg.content, msg.user_id === userId, msg.user_name, msg.timestamp);
     });
   });
 </script>

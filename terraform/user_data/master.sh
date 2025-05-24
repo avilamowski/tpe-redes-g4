@@ -12,8 +12,7 @@ chmod 600 "$KUBECONFIG"
 while [ $(kubectl get nodes | grep Ready | wc -l) -lt 2 ]; do
     sleep 5
 done
-helm repo add bitnami https://charts.bitnami.com/bitnami
-helm install postgres bitnami/postgresql --set auth.username=redes --set auth.password=kubernetes --set auth.database=chatdb
+helm install postgres-db ./charts/postgres-chart
 helm install message-service ./charts/message-service-chart 
 helm install chat-frontend ./charts/chat-frontend-chart
 helm install ingress ./charts/ingress-chart
