@@ -3,7 +3,9 @@ kind: Deployment
 metadata:
   name: message-service
 spec:
-  replicas: {{ .Values.replicaCount | default 1 }}
+  {{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
+  {{- end }}
   selector:
     matchLabels:
       app: message-service

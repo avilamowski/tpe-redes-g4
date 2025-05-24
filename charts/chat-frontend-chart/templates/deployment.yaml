@@ -3,7 +3,9 @@ kind: Deployment
 metadata:
   name: chat-frontend
 spec:
-  replicas: {{ .Values.replicaCount | default 1 }}
+  {{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
+  {{- end }}
   selector:
     matchLabels:
       app: chat-frontend
