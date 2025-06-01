@@ -16,7 +16,7 @@ socketio = SocketIO(app, cors_allowed_origins="*", path="/api/ws")
 
 db = SQLAlchemy(app)
 
-api_bp = Blueprint('api', __name__, url_prefix='/api')
+api_bp = Blueprint("api", __name__, url_prefix="/api")
 
 
 class User(db.Model):
@@ -33,6 +33,7 @@ class Message(db.Model):
     timestamp = db.Column(db.DateTime, default=datetime.utcnow)
 
     user = db.relationship("User")
+
 
 @api_bp.route("/users", methods=["POST"])
 def create_user():
@@ -59,7 +60,14 @@ def get_all_users():
     users = User.query.all()
     return jsonify([{"id": user.id, "name": user.name} for user in users])
 
+
+@api_bp.route("/health", methods=["GET"])
+def health_check():
+    return jsonify({"status": "ok"}), 200
+
+
 app.register_blueprint(api_bp)
+
 
 @socketio.on("send_message")
 def handle_send_message(data):
