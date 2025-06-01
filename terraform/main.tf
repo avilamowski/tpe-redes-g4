@@ -117,16 +117,37 @@ resource "aws_cloudwatch_metric_alarm" "high_cpu" {
 
 resource "aws_security_group" "node_sg" {
   name        = "node-security-group"
-  description = "Allow all inbound and outbound traffic"
+  description = "Allow internal node communication and external access on selected ports"
   vpc_id      = module.vpc.vpc_id
 
+  # Internal communication between nodes in the same security group
   ingress {
     from_port   = 0
     to_port     = 0
     protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
+    self        = true
+    description = "Allow all traffic between instances in the same security group"
   }
 
+  # External access via SSH
+  ingress {
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+    description = "Allow SSH access from anywhere"
+  }
+
+  # External access via HTTP
+  ingress {
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+    description = "Allow HTTP/WebSocket access from anywhere"
+  }
+
+  # Allow all outbound traffic
   egress {
     from_port   = 0
     to_port     = 0
