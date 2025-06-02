@@ -1,5 +1,22 @@
 from flask import Flask, render_template
 import requests
+from logging.config import dictConfig
+
+dictConfig({
+    'version': 1,
+    'formatters': {'default': {
+        'format': '[%(asctime)s] %(levelname)s in %(module)s: %(message)s',
+    }},
+    'handlers': {'wsgi': {
+        'class': 'logging.StreamHandler',
+        'stream': 'ext://flask.logging.wsgi_errors_stream',
+        'formatter': 'default'
+    }},
+    'root': {
+        'level': 'INFO',
+        'handlers': ['wsgi']
+    }
+})
 
 app = Flask(__name__, template_folder="templates")
 PUBLIC_IP = "localhost"
@@ -17,13 +34,13 @@ def get_public_ip():
         return "localhost"
 
 
-# TODO: Logging
 PUBLIC_IP = get_public_ip()
-print(f"[INFO] IP pública detectada: {PUBLIC_IP}")
+app.logger.info("[INFO] IP pública detectada: %s", PUBLIC_IP)
 
 
 @app.route("/frontend")
 def index():
+    app.logger.info("fetched frontend")
     return render_template(
         "index.html",
         ws_api_host=f"http://{PUBLIC_IP}",

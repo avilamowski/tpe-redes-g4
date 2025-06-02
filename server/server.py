@@ -4,6 +4,23 @@ from flask_socketio import SocketIO, emit
 from datetime import datetime
 import os
 from flask_cors import CORS
+from logging.config import dictConfig
+
+dictConfig({
+    'version': 1,
+    'formatters': {'default': {
+        'format': '[%(asctime)s] %(levelname)s in %(module)s: %(message)s',
+    }},
+    'handlers': {'wsgi': {
+        'class': 'logging.StreamHandler',
+        'stream': 'ext://flask.logging.wsgi_errors_stream',
+        'formatter': 'default'
+    }},
+    'root': {
+        'level': 'INFO',
+        'handlers': ['wsgi']
+    }
+})
 
 app = Flask(__name__)
 CORS(app)
@@ -45,6 +62,7 @@ def create_user():
         new_user = User(name=data["name"])
         db.session.add(new_user)
         db.session.commit()
+        app.logger.info("new user created with id: %s, name: %s", new_user.id, new_user.name)
         response = jsonify({"id": new_user.id, "name": new_user.name}), 201
     return response
 
@@ -52,12 +70,14 @@ def create_user():
 @api_bp.route("/users/<int:user_id>", methods=["GET"])
 def get_user(user_id):
     user = User.query.get_or_404(user_id)
+    app.logger.info("fetched user %s", user.id)
     return jsonify({"id": user.id, "name": user.name})
 
 
 @api_bp.route("/users", methods=["GET"])
 def get_all_users():
     users = User.query.all()
+    app.logger.info("fetched all users")
     return jsonify([{"id": user.id, "name": user.name} for user in users])
 
 
@@ -74,6 +94,7 @@ def handle_send_message(data):
     message = Message(user_id=data["user_id"], content=data["content"])
     db.session.add(message)
     db.session.commit()
+    app.logger.info('user %s sent message "%s"', data["user_id"], data["content"])
     emit(
         "new_message",
         {
@@ -90,6 +111,7 @@ def handle_send_message(data):
 @socketio.on("get_messages")
 def handle_get_messages():
     messages = Message.query.order_by(Message.timestamp.asc()).all()
+    app.logger.info("fetched %d messages", len(messages))
     emit(
         "message_list",
         [
