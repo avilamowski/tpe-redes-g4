@@ -1,0 +1,32 @@
+# Default values for frontend-chart.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+# This will set the replicaset count more information can be found here: https://kubernetes.io/docs/concepts/workloads/controllers/replicaset/
+replicaCount: 1
+
+image:
+  pullPolicy: IfNotPresent
+  repository: "j0liu/message-service"
+  tag: "latest"
+
+
+service:
+  port: 5000
+
+
+env:
+  # DATABASE_URL: "postgresql://redes:kubernetes@postgres-postgresql:5432/chatdb"
+  databaseSecret:
+    name: postgres-secret
+    userKey: username
+    passKey: password
+    dbKey: database
+
+# This section is for setting up autoscaling more information can be found here: https://kubernetes.io/docs/concepts/workloads/autoscaling/
+autoscaling:
+  enabled: true
+  minReplicas: 2
+  maxReplicas: 5
+  targetCPUUtilizationPercentage: 50
+  targetMemoryUtilizationPercentage: 50
