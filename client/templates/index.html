@@ -147,6 +147,19 @@
       border-radius: 8px;
       cursor: pointer;
     }
+    #toast {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background-color: #d32f2f;
+      color: white;
+      padding: 12px 20px;
+      border-radius: 6px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+      display: none;
+      z-index: 1000;
+      font-size: 14px;
+    }
   </style>
 </head>
 <body>
@@ -168,6 +181,8 @@
     <button onclick="sendMessage()">&#9658;</button>
   </div>
 </div>
+
+<div id="toast">No se pudo establecer conexión con el servidor.</div>
 
 <script>
   const WS_API_HOST = '{{ ws_api_host }}'; 
@@ -212,6 +227,15 @@
     return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
   }
 
+  function showToast(message) {
+    const toast = document.getElementById('toast');
+    toast.textContent = message;
+    toast.style.display = 'block';
+    setTimeout(() => {
+      toast.style.display = 'none';
+    }, 5000);
+  }
+
   function appendMessage(msg, isUser, userName = '', timestamp = '') {
     const chatBox = document.getElementById('chat-box');
 
@@ -250,6 +274,10 @@
       console.log("Instance uuid: ", msg?.instance_uuid);
       appendMessage(msg.content, msg.user_id === userId, msg.user_name, msg.timestamp);
     });
+  });
+
+  socket.on('connect_error', () => {
+    showToast('No se pudo establecer conexión con el servidor.');
   });
 </script>
 </body>

@@ -21,7 +21,7 @@ Antes de ejecutar cualquier componente del proyecto, es fundamental tener correc
 
 Al acceder a la consola de AWS, se podrá encontrar un apartado llamado **AWS Details**, donde se encuentran las claves de acceso necesarias para la autenticación.
 
-![AWS_Details](./docs/AWS_details.jpg)
+<img src="./docs/AWS_details.jpg" alt="AWS_Details" width="800"/>
 
 Estas credenciales deben guardarse en el archivo de configuración ubicado en `~/.aws/credentials`. Para hacerlo, abrir una terminal y ejecutar el siguiente comando:
 
@@ -45,13 +45,37 @@ Esto creará todos los recursos necesarios en AWS y dejará el entorno listo par
 
 ### 1. Balanceo de carga entre réplicas con WebSockets
 
+#### Objetivo
+
+Distribuir automáticamente el tráfico WebSocket del message-service entre múltiples réplicas usando Kubernetes y un Ingress que utiliza un Controller de Traefik
+
+#### Prueba
+
+Se desplegó el message-service con varias réplicas y se expuso mediante un recurso Ingress configurado para enrutar tráfico WebSocket. Luego se abrieron múltiples conexiones al endpoint público y se verificó, mediante un identificador único por pod, que las conexiones fueron manejadas por distintos pods.
+
+#### Resultado esperado
+
+El tráfico WebSocket se balancea automáticamente entre réplicas del servicio, validando que Kubernetes y Traefik gestionan correctamente las conexiones persistentes sin configuración adicional.
+
+Se ingresó al chat con dos usuarios distintos desde navegadores separados. En la consola de cada navegador se muestra un identificador UUID diferente, correspondiente al pod que atendió cada conexión. Esto refleja que cada usuario fue redirigido a un pod distinto dentro del clúster de Kubernetes.
+
+<img src="./docs/1_uuids.jpg" alt="1_uuids" width="800"/>
+
 ### 2. Tolerancia a fallos ante caída de nodo
 
 ### 3. Escalado automático por carga
 
-**Objetivo**: Evaluar si Kubernetes escala automáticamente las réplicas del message-service según el uso de CPU.\
-**Prueba**: Definir requests y limits de CPU, configurar el Horizontal Pod Autoscaler (HPA) y simular una carga elevada.\
-**Resultado esperado**: El número de réplicas aumenta cuando la CPU supera el umbral y disminuye cuando baja la carga, mejorando la capacidad de respuesta del servicio
+#### Objetivo
+
+Evaluar si Kubernetes escala automáticamente las réplicas del message-service según el uso de CPU.
+
+#### Prueba
+
+Definir requests y limits de CPU, configurar el Horizontal Pod Autoscaler (HPA) y simular una carga elevada.
+
+#### Resultado esperado
+
+El número de réplicas aumenta cuando la CPU supera el umbral y disminuye cuando baja la carga, mejorando la capacidad de respuesta del servicio
 
 Se realizó una prueba de estrés sobre los nodos worker utilizando la herramienta `stress` para simular una carga elevada y evaluar el comportamiento del clúster en condiciones exigentes.
 
@@ -64,17 +88,27 @@ stress -c 10000 -m 250 -t 180s
 Durante la ejecución, se activó una alarma configurada en CloudWatch que monitorea el uso de CPU. La alarma estaba definida con un umbral del 60 % de utilización sostenida durante al menos 2 minutos.
 Como se observa en la siguiente gráfica, el consumo de CPU superó dicho umbral, lo que disparó correctamente el estado In alarm, validando el funcionamiento del sistema de alertas y el monitoreo de recursos.
 
-![Alarm](./docs/3_alarm.png)
+<img src="./docs/3_alarm.png" alt="3_Alarm" width="800"/>
 
-Como resulesta, se inicializaron nuevas instancias EC2 destinadas a ampliar la capacidad del clúster
 
-![EC2](./docs/3_ec2.png)
+Como resultado, se inicializaron nuevas instancias EC2 destinadas a ampliar la capacidad del clúster
+
+<img src="./docs/3_ec2.png" alt="3_EC2" width="800"/>
+
 
 ### 4. Actualización sin downtime y rollback
 
-**Objetivo**: Actualizar message-service sin afectar la disponibilidad del sistema y permitir una reversión rápida si falla.\
-**Prueba**: Cambiar la imagen del contenedor en el deployment, monitorear la actualización y revertir si es necesario.\
-**Resultado esperado**: La actualización se realiza con rolling update sin cortes, y puede deshacerse fácilmente en caso de error.
+#### Objetivo
+
+Actualizar message-service sin afectar la disponibilidad del sistema y permitir una reversión rápida si falla.
+
+#### Prueba
+
+Cambiar la imagen del contenedor en el deployment, monitorear la actualización y revertir si es necesario.
+
+#### Resultado esperado
+
+La actualización se realiza con rolling update sin cortes, y puede deshacerse fácilmente en caso de error.
 
 #### message-service
 
@@ -168,9 +202,17 @@ La imagen con el tag `green` ya se encuentra publicada en Docker Hub y puede ser
 
 ### 5. Acceso centralizado mediante Ingress
 
-**Objetivo**: Acceder a múltiples servicios desde un único punto de entrada mediante reglas de URL.\
-**Prueba**: Configurar un Ingress Controller y definir rutas que direccionen el tráfico a frontend y message-service según la URL.\
-**Resultado esperado**: Ambos servicios son accesibles desde un único dominio, facilitando la gestión de accesos.
+#### Objetivo
+
+Acceder a múltiples servicios desde un único punto de entrada mediante reglas de URL.
+
+#### Prueba
+
+Configurar un Ingress Controller y definir rutas que direccionen el tráfico a frontend y message-service según la URL.
+
+#### Resultado esperado
+
+Ambos servicios son accesibles desde un único dominio, facilitando la gestión de accesos.
 
 #### Comandos de prueba
 
@@ -188,9 +230,16 @@ La imagen con el tag `green` ya se encuentra publicada en Docker Hub y puede ser
 
 ### 6. Persistencia de datos
 
-**Objetivo**: Garantizar que los datos del chat persistan aunque el pod se reinicie o reemplace.\
-**Prueba**: Conectar el servicio a un volumen persistente, eliminar el pod y verificar la persistencia de datos tras el reinicio.\
-**Resultado esperado**: Los datos de los usuarios se conservan, confirmando que el estado no se pierde al reiniciar el contenedor.
+#### Objetivo
+
+Garantizar que los datos del chat persistan aunque el pod se reinicie o reemplace.
+#### Prueba
+
+Conectar el servicio a un volumen persistente, eliminar el pod y verificar la persistencia de datos tras el reinicio.
+
+#### Resultado esperado
+
+Los datos de los usuarios se conservan, confirmando que el estado no se pierde al reiniciar el contenedor.
 
 1. Desinstalar el servicio
 
