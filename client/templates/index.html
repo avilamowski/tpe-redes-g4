@@ -247,6 +247,7 @@
     const chatBox = document.getElementById('chat-box');
     chatBox.innerHTML = '';
     msgs.forEach(msg => {
+      console.log("Instance uuid: ", msg?.instance_uuid);
       appendMessage(msg.content, msg.user_id === userId, msg.user_name, msg.timestamp);
     });
   });

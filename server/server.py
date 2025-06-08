@@ -5,6 +5,7 @@ from datetime import datetime
 import os
 from flask_cors import CORS
 from logging.config import dictConfig
+import uuid
 
 dictConfig({
     'version': 1,
@@ -35,6 +36,7 @@ db = SQLAlchemy(app)
 
 api_bp = Blueprint("api", __name__, url_prefix="/api")
 
+random_uuid = str(uuid.uuid4())
 
 class User(db.Model):
     __tablename__ = "users"
@@ -121,6 +123,7 @@ def handle_get_messages():
                 "user_name": m.user.name,
                 "content": m.content,
                 "timestamp": m.timestamp.isoformat(),
+                "instance_uuid": random_uuid,
             }
             for m in messages
         ],
