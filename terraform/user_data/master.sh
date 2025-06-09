@@ -16,3 +16,4 @@ helm install postgres-db ./charts/postgres-chart
 helm install message-service ./charts/message-service-chart 
 helm install chat-frontend ./charts/chat-frontend-chart
 helm install ingress ./charts/ingress-chart
+helm install logs ./charts/logs-chart --set logstash.host="${logstash_host}"

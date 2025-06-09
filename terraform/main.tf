@@ -22,7 +22,8 @@ data "template_file" "master_user_data" {
   template = file("${path.module}/user_data/master.sh")
 
   vars = {
-    token = "test"
+    token         = "test"
+    logstash_host = aws_instance.logs.private_ip
   }
 }
 

@@ -191,7 +191,7 @@ spec:
         ]
         env:
         - name: LOGSTASH_HOST
-          value: logstash
+          value: {{ .Values.logstash.host | default "logstash" }}
         - name: LOGSTASH_PORT
           value: "5044"
         - name: NODE_NAME

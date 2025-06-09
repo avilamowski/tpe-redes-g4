@@ -27,6 +27,7 @@ echo "changed permissions for docker" >> /progress.txt
 
 git clone https://github.com/Ian-Arnott/TPE-Redes
 cd TPE-Redes
+git reset --hard a849892
 
 echo "pulled repo" >> /progress.txt
 
