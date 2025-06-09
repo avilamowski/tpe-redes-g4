@@ -19,7 +19,7 @@ dictConfig({
 })
 
 app = Flask(__name__, template_folder="templates")
-PUBLIC_IP = "localhost"
+PUBLIC_IP = "minikube"
 
 
 def get_public_ip():
@@ -30,8 +30,7 @@ def get_public_ip():
         response.raise_for_status()
         return response.text
     except requests.exceptions.RequestException as e:
-        # TODO: Logging
-        return "localhost"
+        return "minikube" # Fallback for local development on minikube
 
 
 PUBLIC_IP = get_public_ip()

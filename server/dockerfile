@@ -9,4 +9,5 @@ COPY . .
 
 EXPOSE 5000
 
-ENTRYPOINT ["python", "server.py"]
+# ENTRYPOINT ["python", "server.py"]
+CMD ["gunicorn", "--worker-class", "eventlet", "-w", "1", "-b", "0.0.0.0:5000", "server:app"]

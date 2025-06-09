@@ -1,6 +1,9 @@
+gunicorn
+eventlet
 flask
 flask-sqlalchemy
 flask-socketio
+redis
 eventlet
 psycopg2-binary
 flask-cors

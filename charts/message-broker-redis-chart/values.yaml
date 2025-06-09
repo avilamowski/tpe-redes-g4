@@ -1,0 +1,18 @@
+replicaCount: 1
+
+image:
+  repository: redis
+  tag: "7.2"
+  pullPolicy: IfNotPresent
+
+service:
+  type: ClusterIP
+  port: 6379
+
+resources: {}
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}

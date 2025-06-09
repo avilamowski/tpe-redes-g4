@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: message-broker-redis
+  labels:
+    app: message-broker-redis
+spec:
+  type: {{ .Values.service.type }}
+  ports:
+    - port: {{ .Values.service.port }}
+      targetPort: 6379
+  selector:
+    app: message-broker-redis

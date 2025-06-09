@@ -35,6 +35,8 @@ spec:
               memory: {{ .Values.resources.limits.memory }}
               cpu: {{ .Values.resources.limits.cpu }}
           env:
+            - name: REDIS_HOST
+              value: {{ .Values.redis.host }}
             - name: POSTGRES_USER
               valueFrom:
                 secretKeyRef:

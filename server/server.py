@@ -1,6 +1,7 @@
 from flask import Flask, request, jsonify, Blueprint
 from flask_sqlalchemy import SQLAlchemy
 from flask_socketio import SocketIO, emit
+import redis
 from datetime import datetime
 import os
 from flask_cors import CORS
@@ -30,7 +31,12 @@ app.config["SQLALCHEMY_DATABASE_URI"] = os.getenv(
 )
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
-socketio = SocketIO(app, cors_allowed_origins="*", path="/api/ws")
+socketio = SocketIO(
+    app,
+    cors_allowed_origins="*",
+    path="/api/ws",
+    message_queue=os.getenv("REDIS_URL", "redis://message-broker-redis"),
+)
 
 db = SQLAlchemy(app)
 
