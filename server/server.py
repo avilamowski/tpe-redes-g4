@@ -6,6 +6,8 @@ import os
 from flask_cors import CORS
 from logging.config import dictConfig
 import uuid
+import threading
+import time
 
 dictConfig({
     'version': 1,
@@ -87,6 +89,11 @@ def get_all_users():
 def health_check():
     return jsonify({"status": "ok"}), 200
 
+@app.errorhandler(Exception)
+def handle_exception(e):
+    app.logger.exception("Unhandled exception: %s", e)
+    return jsonify({"error": str(e)}), 500
+
 
 app.register_blueprint(api_bp)
 
@@ -138,5 +145,33 @@ def create_tables():
 with app.app_context():
     db.create_all()
 
+
+# Polling other instance messages
+poll_interval = 1  
+
+def poll_new_messages():
+    last_message_id = 0
+
+    while True:
+        time.sleep(poll_interval)
+
+        with app.app_context():
+            new_messages = Message.query.filter(Message.id > last_message_id).order_by(Message.id).all()
+
+            for message in new_messages:
+                socketio.emit(
+                    "new_message",
+                    {
+                        "id": message.id,
+                        "user_id": message.user_id,
+                        "user_name": message.user.name,
+                        "content": message.content,
+                        "timestamp": message.timestamp.isoformat(),
+                    },
+                )
+                app.logger.info("Emitted new_message from polling for message id: %s", message.id)
+                last_message_id = message.id
+
 if __name__ == "__main__":
+    socketio.start_background_task(target=poll_new_messages)
     socketio.run(app, host="0.0.0.0", port=5000)
