@@ -12,6 +12,8 @@ module "vpc" {
   azs                     = ["us-east-1a", "us-east-1b"]
   public_subnets          = ["10.0.1.0/24", "10.0.2.0/24", "10.0.3.0/24"]
   public_subnet_names     = ["public-subnet-1", "public-subnet-2", "public-subnet-3"]
+  private_subnets         = ["10.0.4.0/24"]
+  private_subnet_names    = ["private-subnet-1"]
   map_public_ip_on_launch = true
 }
 
@@ -20,7 +22,8 @@ data "template_file" "master_user_data" {
   template = file("${path.module}/user_data/master.sh")
 
   vars = {
-    token = "test"
+    token         = "test"
+    logstash_host = aws_instance.logs.private_ip
   }
 }
 
@@ -35,6 +38,28 @@ resource "aws_instance" "master" {
 
   tags = {
     Name = "master-node"
+  }
+}
+
+data "template_file" "logs_user_data" {
+  template = file("${path.module}/user_data/logs.sh")
+
+  vars = {
+    token = "test"
+  }
+}
+
+resource "aws_instance" "logs" {
+  ami                         = local.ami
+  instance_type               = local.instance_type
+  key_name                    = aws_key_pair.node-key.key_name
+  vpc_security_group_ids      = [aws_security_group.node_sg.id]
+  user_data                   = data.template_file.logs_user_data.rendered
+  subnet_id                   = module.vpc.public_subnets[0]
+  associate_public_ip_address = true
+
+  tags = {
+    Name = "logs"
   }
 }
 
@@ -164,6 +189,11 @@ output "worker_nodes_in_asg" {
 output "ssh_commands_to_master_node" {
   value       = "ssh ubuntu@${aws_instance.master.public_dns}"
   description = "SSH commands to connect to Kubernetes master node"
+}
+
+output "ssh_commands_to_logs" {
+  value       = "ssh ubuntu@${aws_instance.logs.public_dns}"
+  description = "SSH commands to connect to logs"
 }
 
 output "master_node_public_ip" {
