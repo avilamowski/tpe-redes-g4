@@ -36,6 +36,5 @@ sudo ./generate-certs.sh
 echo "generate certificates" >> /progress.txt
 
 cd elk-stack
-docker compose up --build
-
-echo "compose up" >> /progress.txt
+# docker compose up --build
+# echo "compose up" >> /progress.txt

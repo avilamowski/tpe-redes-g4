@@ -95,7 +95,7 @@ resource "aws_autoscaling_group" "worker_asg" {
   desired_capacity    = 2
   max_size            = 5
   min_size            = 2
-  vpc_zone_identifier = module.vpc.public_subnets
+  vpc_zone_identifier = [module.vpc.public_subnets[1], module.vpc.public_subnets[2]]
 
   launch_template {
     id      = aws_launch_template.worker_lt.id
