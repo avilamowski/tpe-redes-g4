@@ -29,6 +29,13 @@ Estas credenciales deben guardarse en el archivo de configuración ubicado en `~
 sudo nano ~/.aws/credentials
 ```
 
+### Actualizar el archivo de locals.tf
+En el archivo `terraform/locals.tf`, se debe actualizar la variable `key_file_name` con la ruta al archivo de clave pública SSH que se utilizará para acceder a las instancias EC2.
+
+```hcl
+key_file_name = "~/.ssh/id_rsa.pub"
+```
+
 ### Inicializar y aplicar la infraestructura con Terraform
 
 Una vez que las credenciales estén configuradas correctamente, el siguiente paso es desplegar la infraestructura necesaria usando Terraform. Para ello, deben correrse los siguientes comandos en la terminal:
