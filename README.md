@@ -21,13 +21,14 @@ Antes de ejecutar cualquier componente del proyecto, es fundamental tener correc
 
 Al acceder a la consola de AWS, se podrá encontrar un apartado llamado **AWS Details**, donde se encuentran las claves de acceso necesarias para la autenticación.
 
-<img src="./docs/AWS_details.jpg" alt="AWS_Details" width="800"/>
+<img src="./docs/images/AWS_details.jpg" alt="AWS_Details" width="800"/>
 
 Estas credenciales deben guardarse en el archivo de configuración ubicado en `~/.aws/credentials`. Para hacerlo, abrir una terminal y ejecutar el siguiente comando:
 
 ```bash
 sudo nano ~/.aws/credentials
 ```
+luego, copiar las claves de acceso en el archivo.
 
 ### Actualizar el archivo de locals.tf
 En el archivo `terraform/locals.tf`, se debe actualizar la variable `key_file_name` con la ruta al archivo de clave pública SSH que se utilizará para acceder a las instancias EC2.
@@ -78,7 +79,7 @@ Se desplegó el message-service con varias réplicas y se expuso mediante un rec
 
 Se ingresó al chat con dos usuarios distintos desde navegadores separados. En la consola de cada navegador se muestra un identificador UUID diferente, correspondiente al pod que atendió cada conexión. Esto refleja que cada usuario fue redirigido a un pod distinto dentro del clúster de Kubernetes.
 
-<img src="./docs/1_uuids.jpg" alt="1_uuids" width="800"/>
+<img src="./docs/images/1_uuids.jpg" alt="1_uuids" width="800"/>
 
 
 #### Resultado esperado
@@ -142,12 +143,12 @@ stress -c 10000 -m 250 -t 180s
 Durante la ejecución, se activó una alarma configurada en CloudWatch que monitorea el uso de CPU. La alarma estaba definida con un umbral del 60 % de utilización sostenida durante al menos 2 minutos.
 Como se observa en la siguiente gráfica, el consumo de CPU superó dicho umbral, lo que disparó correctamente el estado In alarm, validando el funcionamiento del sistema de alertas y el monitoreo de recursos.
 
-<img src="./docs/3_alarm.png" alt="3_Alarm" width="800"/>
+<img src="./docs/images/3_alarm.png" alt="3_Alarm" width="800"/>
 
 
 Como resultado, se inicializaron nuevas instancias EC2 destinadas a ampliar la capacidad del clúster
 
-<img src="./docs/3_ec2.png" alt="3_EC2" width="800"/>
+<img src="./docs/images/3_ec2.png" alt="3_EC2" width="800"/>
 
 #### Prueba de estrés sobre pods
 
@@ -260,7 +261,7 @@ La imagen con el tag `green` ya se encuentra publicada en Docker Hub y puede ser
 
 4. Verificar visualmente que la interfaz web aparece con color verde.
 
-   <img src="./docs/4_green_interface.png" alt="Green" width="300"/>
+   <img src="./docs/images/4_green_interface.png" alt="Green" width="300"/>
 
 5. Ejecutar un rollback para volver al estado anterior (color violeta):
 
