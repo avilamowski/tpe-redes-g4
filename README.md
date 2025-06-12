@@ -50,7 +50,7 @@ terraform apply
 Esto creará todos los recursos necesarios en AWS y dejará el entorno listo para utilizar el sistema.
 
 ### Conexión por SSH a la instancia EC2
-Una vez que la infraestructura esté desplegada, se podrá acceder a la instancia EC2 creada por Terraform. Para conectarse, se debe utilizar el comando SSH con la clave privada generada durante el proceso de creación de la infraestructura.
+Una vez que la infraestructura esté desplegada, se podrá acceder a las instancias EC2 de master y logs creada por Terraform. Para conectarse, se debe utilizar el comando SSH. La salida de terraform muestra los comandos para conectarse con SSH para la instancia de master y de logs respectivamente.
 
 ```bash
 ssh ubuntu@<nombre-de-la-instancia-ec2>
@@ -347,3 +347,42 @@ Conectar el servicio a un volumen persistente, eliminar el pod y verificar la pe
 #### Resultado esperado
 
 Los datos de los usuarios se conservan, confirmando que el estado no se pierde al reiniciar el contenedor.
+
+## Integración con ELK
+Para probar la integración con ELK se deben seguir los siguientes pasos.
+
+Conectarse via ssh a la instancia de logs. Dentro, ejecutar los siguientes comandos:
+```bash
+sudo groupadd -f docker
+sudo usermod -aG docker $$USER
+newgrp docker
+
+cd /TPE-Redes/elk-stack
+docker compose up
+```
+El `docker compose` puede fallar por falta de espacio, pero suele funcionar si se ejecuta de vuelta.
+Esperar a que se termine de levantar los containers.
+
+Se puede considerar terminado cuando se queda mostrando lo siguiente.
+```
+2025-06-12T01:07:27,253][INFO ][o.o.m.c.MLSyncUpCron     ] [opensearch] Skipping sync up job - ML model index not found
+```
+
+Luego, obtener la ip privada de la instancia de logs y conectarse via ssh a la instancia de master. Dentro, ejecutar los siguientes comandos:
+
+```bash
+export KUBECONFIG=~/.kube/config
+mkdir ~/.kube 2> /dev/null
+sudo k3s kubectl config view --raw > "$KUBECONFIG"
+chmod 600 "$KUBECONFIG"
+cd /tpe-redes-g4
+helm install logs ./charts/logs-chart --set logstash.host=<ip-privada-de-instancia-de-logs>"
+```
+
+Luego, para ver la interfaz de `opensearch`, se puede utilizar un tunel ssh que redirija el puerto `5601` de `logs` al puerto `5602`:
+
+```bash
+ssh -L 5602:127.0.0.1:5601 ubuntu@<nombre-de-la-instancia-de-logs>
+```
+
+Luego, en el navegador se puede ir a `https://localhost:5602` para ver la interfaz de `opensearch`.
